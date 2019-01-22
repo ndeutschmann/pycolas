@@ -28,8 +28,7 @@ class Result(object):
         if isinstance(other,Result):
             if self.unit != other.unit:
                 print "WARNING YOU ARE ADDING APPLES AND BANANAS !!! ({}+{})".format(self.unit,other.unit)
-
-            return Result(
+            result = Result(
                 {
                     "Cross section": self.value+other.value,
                     "MC uncertainty": sqrt(self.uncertainty**2+other.uncertainty**2),
@@ -39,13 +38,15 @@ class Result(object):
                     "unit": self.unit
                 }
             )
+            return result
+
     def __sub__(self, other):
         """TODO DOC """
         if isinstance(other,Result):
             if self.unit != other.unit:
                 print "WARNING YOU ARE SUBTRACTING APPLES AND BANANAS !!! ({}+{})".format(self.unit,other.unit)
 
-            return Result(
+            result = Result(
                 {
                     "Cross section": self.value-other.value,
                     "MC uncertainty": sqrt(self.uncertainty**2+other.uncertainty**2),
@@ -55,9 +56,13 @@ class Result(object):
                     "unit": self.unit
                 }
             )
+            return result
 
-    def str(self):
-        return "{:e.4} +/- {:e.4}".format(self.value,self.uncertainty)
+    def __str__(self):
+        return "{:4.4e} +/- {:4.4e}".format(self.value,self.uncertainty)
+
+    def __repr__(self):
+        return ('{} {}='.format(type(self),self.name))+self.__str__()
 
 
 class ResultDict(object):
