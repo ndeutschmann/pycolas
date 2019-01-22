@@ -39,6 +39,22 @@ class Result(object):
                 }
             )
             return result
+        elif isinstance(other,float) or isinstance(other,int):
+            result = Result(
+                {
+                    "Cross section": self.value+other,
+                    "MC uncertainty": self.uncertainty,
+                    "name": self.name+"+"+str(other),
+                    "order": self.order,
+                    "timestamp": self.timestamp,
+                    "unit": self.unit
+                }
+            )
+            return result
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
 
     def __sub__(self, other):
         """TODO DOC """
@@ -53,6 +69,18 @@ class Result(object):
                     "name": self.name+"-"+other.name,
                     "order": self.order+"-"+other.order,
                     "timestamp": self.timestamp+"-"+other.timestamp,
+                    "unit": self.unit
+                }
+            )
+            return result
+        elif isinstance(other,float) or isinstance(other,int):
+            result = Result(
+                {
+                    "Cross section": self.value-other,
+                    "MC uncertainty": self.uncertainty,
+                    "name": self.name+"+"+str(other),
+                    "order": self.order,
+                    "timestamp": self.timestamp,
                     "unit": self.unit
                 }
             )
