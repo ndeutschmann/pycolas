@@ -18,10 +18,10 @@ class Result(object):
 
         self.value = float(result_dict["Cross section"])
         self.uncertainty = float(result_dict["MC uncertainty"])
-        self.name = string(result_dict["name"])
-        self.timestamp = string(result_dict["timestamp"])
-        self.unit = string(result_dict["unit"])
-        self.order = string(result_dict["order"])
+        self.name = str(result_dict["name"])
+        self.timestamp = str(result_dict["timestamp"])
+        self.unit = str(result_dict["unit"])
+        self.order = str(result_dict["order"])
 
     def __add__(self, other):
         """TODO DOC """
@@ -67,7 +67,7 @@ class ResultDict(object):
         if json_path!=None:
             #TODO add exception handling
             with open(json_path,"r") as my_json_file:
-                json_dict = json.load(my_json_file.read())
+                json_dict = json.loads(my_json_file.read())
             for key in json_dict:
                 self._dict[key]=Result(json_dict[key])
 
@@ -75,4 +75,4 @@ class ResultDict(object):
         return self._dict[item]
 
     def __setitem__(self, key, value):
-        self._dict[item] = value
+        self._dict[key] = value
