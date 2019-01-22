@@ -2,6 +2,7 @@
 TODO DOC
 """
 from math import sqrt
+import json
 
 class Result(object):
     """A class that contains a single MadNkLO results
@@ -57,3 +58,21 @@ class Result(object):
 
     def str(self):
         return "{:e.4} +/- {:e.4}".format(self.value,self.uncertainty)
+
+
+class ResultDict(object):
+    """A dictionnary of Results initialized from a JSON file"""
+    def __init__(self,json_path=None):
+        self._dict = {}
+        if json_path!=None:
+            #TODO add exception handling
+            with open(json_path,"r") as my_json_file:
+                json_dict = json.load(my_json_file.read())
+            for key in json_dict:
+                self._dict[key]=Result(json_dict[key])
+
+    def __getitem__(self, item):
+        return self._dict[item]
+
+    def __setitem__(self, key, value):
+        self._dict[item] = value
