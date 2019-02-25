@@ -1,1 +1,1 @@
-from results import ResultDict
+from results import *
