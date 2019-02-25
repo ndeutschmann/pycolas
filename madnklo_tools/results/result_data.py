@@ -3,11 +3,31 @@ TODO DOC
 """
 from math import sqrt
 import json
+from numbers import Number
 
 class Result(object):
     """A class that contains a single MadNkLO results
     """
-    def __init__(self,result_dict):
+    def result_from_dict(self,result_dict):
+        self.value = float(result_dict["Cross section"])
+        self.uncertainty = float(result_dict["MC uncertainty"])
+        self.name = str(result_dict["name"])
+        self.timestamp = str(result_dict["timestamp"])
+        self.unit = str(result_dict["unit"])
+        self.order = str(result_dict["order"])
+
+    def result_from_value_uncertainty(self,value,uncertainty):
+        self.value = float(value)
+        self.uncertainty = float(uncertainty)
+        if uncertainty == 0.:
+            self.name = "[{:1.1e}]".format(self.value)
+        else:
+            self.name = "[{:1.1e}+/-{:1.1e}]".format(self.value,self.uncertainty)
+        self.timestamp = ""
+        self.unit = "pb"
+        self.order = ""
+
+    def __init__(self,*input):
         """Get a dictionnary with the following keys:
         -TODO
 
@@ -15,13 +35,19 @@ class Result(object):
         :type result_dict:
         """
         #TODO Input sanitization
+        if len(input) == 1 and isinstance(input[0], dict):
+            self.result_from_dict(input[0])
 
-        self.value = float(result_dict["Cross section"])
-        self.uncertainty = float(result_dict["MC uncertainty"])
-        self.name = str(result_dict["name"])
-        self.timestamp = str(result_dict["timestamp"])
-        self.unit = str(result_dict["unit"])
-        self.order = str(result_dict["order"])
+        elif len(input) ==2 and all(isinstance(n, Number) for n in input):
+            self.result_from_value_uncertainty(*input)
+
+        elif len(input) ==1 and isinstance(input[0],Number):
+            self.result_from_value_uncertainty(input[0],0)
+
+        else:
+            raise ValueError("Results expect either a dictionary from a JSON result file or two numbers (value,error) as argument")
+
+
 
     def __add__(self, other):
         """TODO DOC """
@@ -39,17 +65,8 @@ class Result(object):
                 }
             )
             return result
-        elif isinstance(other,float) or isinstance(other,int):
-            result = Result(
-                {
-                    "Cross section": self.value+other,
-                    "MC uncertainty": self.uncertainty,
-                    "name": self.name+"+"+str(other),
-                    "order": self.order,
-                    "timestamp": self.timestamp,
-                    "unit": self.unit
-                }
-            )
+        elif isinstance(other,Number):
+            result = self+Result(other,0.)
             return result
 
     def __radd__(self, other):
@@ -73,18 +90,12 @@ class Result(object):
                 }
             )
             return result
-        elif isinstance(other,float) or isinstance(other,int):
-            result = Result(
-                {
-                    "Cross section": self.value-other,
-                    "MC uncertainty": self.uncertainty,
-                    "name": self.name+"+"+str(other),
-                    "order": self.order,
-                    "timestamp": self.timestamp,
-                    "unit": self.unit
-                }
-            )
+        elif isinstance(other, Number):
+            result = self - Result(other, 0.)
             return result
+
+    def is_zero(self,n_sigma=2):
+        return abs(self.value) < abs(n_sigma*self.uncertainty)
 
     def __str__(self):
         return "{:4.4e} +/- {:4.4e}".format(self.value,self.uncertainty)
@@ -109,3 +120,15 @@ class ResultDict(object):
 
     def __setitem__(self, key, value):
         self._dict[key] = value
+
+    def __str__(self):
+        stringDict = ""
+        for k in self._dict.keys():
+            stringDict+="{}: {}\n".format(k,str(self[k]))
+        return stringDict
+
+##########################
+# Specific objects
+##########################
+
+zero_pb = Result(0)
