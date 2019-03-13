@@ -145,12 +145,16 @@ class Result(object):
 
 class ResultDict(object):
     """A dictionnary of Results initialized from a JSON file"""
-    def __init__(self,json_path=None):
+    def __init__(self,json_path=None, literal_string=None):
         self._dict = {}
-        if json_path!=None:
+        if json_path is not None:
             #TODO add exception handling
             with open(json_path,"r") as my_json_file:
                 json_dict = json.loads(my_json_file.read())
+            for key in json_dict:
+                self._dict[key]=Result(json_dict[key])
+        elif literal_string is not None:
+            json_dict = json.loads(literal_string)
             for key in json_dict:
                 self._dict[key]=Result(json_dict[key])
 
