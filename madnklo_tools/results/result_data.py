@@ -94,6 +94,45 @@ class Result(object):
             result = self - Result(other, 0.)
             return result
 
+    def __rsub__(self, other):
+        """TODO DOC"""
+        if isinstance(other, Number):
+            result = Result(other, 0.)-self
+            return result
+
+    def __mul__(self, other):
+        """TODO DOC"""
+        if isinstance(other,Result):
+            if self.unit != other.unit:
+                print "WARNING YOU ARE SUBTRACTING APPLES AND BANANAS !!! ({}+{})".format(self.unit,other.unit)
+
+            E1 = self.value
+            E2 = other.value
+            S1 = self.uncertainty**2
+            S2 = other.uncertainty**2
+            # Assuming normal variables,
+            # Formula: Var(X*Y) = Var(X)*Var(Y) + Var(X)*E(Y)**2 + Var(Y)*E(X)**2
+            # There should be a check that the higher moments are negligble
+
+            result = Result(
+                {
+                    "Cross section": E1*E2,
+                    "MC uncertainty": sqrt(S1*S2+S1*E2**2+S2*E1**2),
+                    "name": self.name+"*"+other.name,
+                    "order": self.order+"*"+other.order,
+                    "timestamp": self.timestamp+"*"+other.timestamp,
+                    "unit": self.unit
+                }
+            )
+            return result
+        elif isinstance(other, Number):
+            result = Result(other, 0.)*self
+            return result
+
+    def __rmul__(self, other):
+        """TODO DOC"""
+        return self*other
+
     def is_zero(self,n_sigma=2):
         return abs(self.value) < abs(n_sigma*self.uncertainty)
 
