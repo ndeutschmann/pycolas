@@ -136,6 +136,19 @@ class Result(object):
     def is_zero(self,n_sigma=2):
         return abs(self.value) < abs(n_sigma*self.uncertainty)
 
+    def count_sigmas(self, comparison=0):
+        """Return the number of standard deviations away from a comparison value (default 0). The comparison value
+        can be a number or a Result itself. Possibility of returning `float('inf')` in case the difference has no
+        uncertainty and is not exactly 0."""
+        delta = self - comparison
+        if delta.uncertainty == 0.:
+            if abs(delta.value) == 0.:
+                return 0.
+            else:
+                return float('inf')
+        else:
+            return abs(delta.value) / delta.uncertainty
+
     def __str__(self):
         return "{:4.4e} +/- {:4.4e}".format(self.value,self.uncertainty)
 
