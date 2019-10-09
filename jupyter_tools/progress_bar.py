@@ -1,4 +1,4 @@
-from IPython.display import display
+from IPython.display import display,HTML
 
 class ProgressBar:
 
@@ -21,13 +21,13 @@ class ProgressBar:
             percent =  int(100*self.step/self.n_steps)
             
 
-        return "{PROCESS}: [{DONE}{TODO}] {PERCENT}%".format(PROCESS=self.process_name,DONE="="*step_nb,TODO=" "*(self.bar_length-step_nb),PERCENT=percent)
+        return HTML("<h1 style='font-family:monospace'>{PROCESS}: [{DONE}{TODO}] {PERCENT}%</h1>".format(PROCESS=self.process_name,DONE="="*(step_nb),TODO="&nbsp;"*(self.bar_length-step_nb),PERCENT=percent))
 
     def display_init(self):
         self.display=display(self.gen_string(),display_id=True)
 
     def __call__(self,step):
-        if self.display = None:
+        if self.display == None:
             self.display_init()
         self.step = step
         self.display.update(self.gen_string())
